@@ -3,17 +3,17 @@
 class Module {
   private static $cache = [];
 
-  public static get function($includePath){
+  public static function &get($includePath){
     $includePath = realpath($includePath);
-    if (!array_key_exists($includePath, $this->cache)){
-      $this->cache = & $this->wrapImport($includePath);
+    if (!array_key_exists($includePath, self::$cache)){
+      self::$cache[$includePath] = &self::wrapImport($includePath);
     }
-    return &$this->cache[$includePath];
+    return self::$cache[$includePath];
   }
 
-  private static wrapImport($includePath){
+  private static function &wrapImport($includePath){
     $exports = [];
     require_once($includePath);
-    return & $exports;
+    return $exports;
   }
 }
