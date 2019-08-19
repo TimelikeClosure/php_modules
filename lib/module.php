@@ -19,13 +19,21 @@ class Module {
   }
 
   private static function &wrapImport($includePath){
-    $globalDeclarationsBeforeImport = self::getGlobalDeclareCounts();
     $importScope = &self::importScope($includePath);
-    $globalDeclarationsAfterImport = self::getGlobalDeclareCounts();
-    if ($globalDeclarationsAfterImport !== $globalDeclarationsBeforeImport){
-      throw new Exception('INVALID MODULE: Modules cannot declare global functions or classes.');
-    }
     return $importScope;
+  }
+
+  private static function &enforcePurity(&$wrappedFunction){
+    $functionWrapper = function &(&...$args) use (&$wrappedFunction){
+      $globalDeclarationsBeforeImport = self::getGlobalDeclareCounts();
+      $wrappedFunctionResult = &$wrappedFunction(...$args);
+      $globalDeclarationsAfterImport = self::getGlobalDeclareCounts();
+      if ($globalDeclarationsAfterImport !== $globalDeclarationsBeforeImport){
+        throw new Exception('INVALID MODULE: Modules cannot produce side effects.');
+      }
+      return $wrappedFunctionResult;
+    };
+    return $functionWrapper;
   }
 
   private static function getGlobalDeclareCounts(){
@@ -37,8 +45,14 @@ class Module {
   }
 
   private static function &importScope($includePath){
-    $exports = [];
-    require_once($includePath);
-    return $exports;
+    $importScope = function &($includePath){
+      $exports = [];
+      require_once($includePath);
+      return $exports;
+    };
+
+    $module = &self::enforcePurity($importScope)($includePath);
+
+    return $module;
   }
 }
