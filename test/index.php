@@ -17,6 +17,12 @@ require_once(__DIR__.'/../index.php');
     echo Module::get(__DIR__.'/body.php');
     echo Module::get(__DIR__.'/body.php');
     echo Module::get(__DIR__.'/body.php');
+    try {
+      Module::get(__DIR__.'/global_declarations.php');
+      echo '<h1>ERROR: Module global declaration test failed!</h1>';
+    } catch (Exception $error) {
+      echo '<h1>Module global declaration test passed.</h1>';
+    }
     ?> 
   </body>
 </html>
