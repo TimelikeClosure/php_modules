@@ -5,10 +5,15 @@ class Module {
 
   public static function &get($includePath){
     $includePath = realpath($includePath);
+
     if (!array_key_exists($includePath, self::$cache)){
       self::$cache[$includePath] = &self::wrapImport($includePath);
     }
-    return self::$cache[$includePath];
+    $exports = & self::$cache[$includePath];
+    if (is_array($exports)){
+      $exports = $exports;
+    }
+    return $exports;
   }
 
   private static function &wrapImport($includePath){
