@@ -15,7 +15,7 @@ require_once(__DIR__.'/../index.php');
       echo $body;
     }
     echo Module::get(__DIR__.'/body.php');
-    echo Module::get(__DIR__.'/body.php');
+    echo Module::get(__DIR__.'/subfolder/body.php');
     echo Module::get(__DIR__.'/body.php');
     try {
       Module::get(__DIR__.'/global_declarations.php');
